@@ -16,3 +16,15 @@ img {
   display: block;
   max-width: 100%;
 }
+
+.color_switcher {
+  margin: 0 auto;
+  display: flex;
+  // align-items: center;
+  align-content: center;
+  justify-content: center;
+}
+
+.btn {
+  margin: 5;
+}

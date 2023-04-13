@@ -3,6 +3,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 let intervalId = null;
+let isActiveTimer = false;
 
 const refs = {
   date_picker: document.querySelector('#datetime-picker'),
@@ -29,11 +30,12 @@ flatpickr(refs.date_picker, {
     // console.log('****', selectedDates[0].getTime());
     if (selectedDates[0].getTime() < Date.now()) {
       //   refs.start.setAttribute('disabled', 'disabled');
-      refs.startBtn.disabled = false;
+      refs.startBtn.disabled = true;
       Notify.failure('Обрана дата менша за поточну дату!');
     } else {
-      if (refs.startBtn.hasAttribute('disabled')) {
-        refs.startBtn.disabled = true;
+      if (refs.startBtn.hasAttribute('disabled') && !isActiveTimer) {
+        isActiveTimer = true;
+        refs.startBtn.disabled = false;
         Notify.success('Натисніть старт.');
       }
     }
@@ -52,16 +54,20 @@ function handleStartTimer() {
 
     const { days, hours, minutes, seconds } = convertMs(ms);
 
+    if (ms < 1000) {
+      clearInterval(intervalId);
+      refs.second.textContent = '00';
+      isActiveTimer = false;
+      refs.startBtn.disabled = true;
+      refs.date_picker.disabled = false;
+      return;
+    }
+
+    isActiveTimer = true;
     refs.second.textContent = addLeadingZero(seconds);
     refs.minute.textContent = addLeadingZero(minutes);
     refs.hour.textContent = addLeadingZero(hours);
     refs.days.textContent = addLeadingZero(days);
-
-    if (ms < 1000) {
-      clearInterval(intervalId);
-      refs.startBtn.disabled = false;
-      refs.date_picker.disabled = false;
-    }
   }, 1000);
 }
 
@@ -87,3 +93,5 @@ function convertMs(ms) {
 function addLeadingZero(value) {
   return `${value}`.padStart(2, '0');
 }
+
+function refreshTimer() {}
